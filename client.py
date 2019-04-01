@@ -24,8 +24,8 @@ def updateScript():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-#if clientVersion != originalVersion:
-#    updateScript()
+if clientVersion != originalVersion:
+    updateScript()
 
 from linepy import LINE as CLIENT
 from linepy import OEPoll
@@ -365,6 +365,8 @@ def execute(op):
                     client.sendMessage(to, "ตรวจพบแพทซ์ใหม่")
                     op.message.text = "[updateScript]"
                     clientSettings["lastOp"] = str(op)
+                    saveSettings()
+                    time.sleep(1)
                     updateScript()
                 return client.sendMessage(to, "ไม่พบข้อผิดพลาดหรือแพทช์ใหม่")
             clientSettings["rebootTime"] = time.time()
