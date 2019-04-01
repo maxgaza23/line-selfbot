@@ -1,4 +1,5 @@
-# LINE SELF BOT BY PASUNX
+# FREE SELF BOT - 01
+LINE APPLICATION UNOFFICIAL BOT
 ### INSTALLATION
 ```sh
 $ python -m pip install -r requirement.txt
