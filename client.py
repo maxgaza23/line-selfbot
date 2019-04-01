@@ -24,8 +24,8 @@ def updateScript():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-#if clientVersion != originalVersion:
-#    updateScript()
+if clientVersion != originalVersion:
+    updateScript()
 
 from linepy import LINE as CLIENT
 from linepy import OEPoll
@@ -56,7 +56,7 @@ helpMessageJSON = {
     'รายละเอียดบัญชี': {
         "ชื่อผู้ใช้งาน: {dp}": "",
         "เวลาทำงาน: {rt}": "",
-        "ไอดี: {mid}": "",
+        "ไอดี: {mid}": ""
     },
     'คำสั่งทั่วไป': {
         "profile (@)": "โปรไฟล์",
@@ -68,12 +68,12 @@ helpMessageJSON = {
         "reader":"ดูบัญชีที่อ่านข้อความ",
         "tagall":"แท็กสมาชิกทั้งหมด"
     },
-	'คำสั่งพิเศษ': {
+    'คำสั่งพิเศษ': {
         "shorturl": "ย่อ URL"
-	},
+    },
     'บัญชี': {
         "freboot": "บังคับเริ่มระบบใหม่",
-        "reboot": "เริ่มระบบใหม่",
+        "reboot": "เริ่มระบบใหม่หรืออัพเดทระบบ",
         "logout": "ออกจากระบบ"
     }
 }
@@ -214,6 +214,7 @@ def execute(op):
     global clientSettings
     global OPTEST
     global clientErrorOrNewPath
+    global clientVersion
     if op.type == 1:
         return getProfile()
     if op.type == 13:
