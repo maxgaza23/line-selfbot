@@ -64,7 +64,7 @@ def helpMessage():
     global clientSettings
     helpMessageList = []
     for x, y in enumerate(helpMessageJSON):
-        helpMessageList.append("{l} {title} {l}".format(title=y, l="-"*7))
+        helpMessageList.append("{l} {title} {l}".format(title=y, l="-"*10))
         for z in helpMessageJSON[y]: helpMessageList.append("- {prefix}{command}".format(prefix=clientSettings["prefix"], command=z))
     return ('\n'.join(helpMessageList))
 
