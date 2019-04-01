@@ -227,11 +227,11 @@ def execute(op):
             if to not in clientSettings['mimic']:
                 clientSettings['mimic'][to] = {}
             if settingsCommand2(cmd) == None and cmd == "mimic":
-                midsList = [client.getContact(mid).displayName for mid in clientSettings['mimic'][to]]
-                if midsList == []:
+                mimicList = [client.getContact(mid).displayName for mid in clientSettings['mimic'][to]]
+                if mimicList == []:
                     return client.sendMessage(to, 'ไม่มีรายชื่อที่ลอกเลียนแบบ')
-                text = "รายชื่อบัญชีที่เลียนแบบ:\n"
-                for x in text: text+="\n- {}".format(x)
+                text = "รายชื่อบัญชีที่เลียนแบบ:"
+                for x in mimicList: text+="\n- {}".format(x)
                 return client.sendMessage(to, text)
             cmd = settingsCommand2(cmd)
             if cmd is not None:
