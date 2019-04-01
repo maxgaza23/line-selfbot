@@ -24,8 +24,8 @@ def updateScript():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-if clientVersion != originalVersion:
-    updateScript()
+#if clientVersion != originalVersion:
+#    updateScript()
 
 from linepy import LINE as CLIENT
 from linepy import OEPoll
@@ -362,6 +362,7 @@ def execute(op):
             if clientErrorOrNewPatch == []:
                 originalVersion = requests.get("https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/version.txt").text
                 if clientVersion != originalVersion:
+                    client.sendMessage(to, "ตรวจพบแพทซ์ใหม่")
                     op.message.text = "[updateScript]"
                     clientSettings["lastOp"] = str(op)
                     updateScript()
