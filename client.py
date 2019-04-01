@@ -329,11 +329,12 @@ def execute(op):
             result = "URLs:"
             if urlsList != []:
                 for num, url in enumerate(urlsList):
-                    r = requests.get("https://pasunx.tk/api/urlshorten.php?url={url}".format(url=url))
-                    res = json.loads(r.text)['text']
-                    if res == "VALID URL! URL must be startwith http or https":
-                        res = "URL ไม่ถูกต้อง"
-                    result+="\n[{}.] {}\n- {}".format(num+1, url, res)
+                    if url not in result:
+                        r = requests.get("https://pasunx.tk/api/urlshorten.php?url={url}".format(url=url))
+                        res = json.loads(r.text)['text']
+                        if res == "VALID URL! URL must be startwith http or https":
+                            res = "URL ไม่ถูกต้อง"
+                        result+="\n[{}.] {}\n- {}".format(num+1, url, res)
                 client.sendMessage(to, result)
         if cmd == "profile" and ononlist:
             profileList = []
