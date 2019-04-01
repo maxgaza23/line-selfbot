@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests, json, codecs, time, sys, os
-clientVersion = open('version.txt','r').readlines()[0]
+if not os.path.isfile(fileName): clientVersion = "0.0.0.0"
+else: clientVersion = open('version.txt','r').readlines()[0]
 originalVersion = requests.get("https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/version.txt").text
 
 def removeIfIsFile(fileName):
