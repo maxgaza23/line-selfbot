@@ -360,6 +360,11 @@ def execute(op):
             return client.sendMessage(to, "กรุณาตั้งค่าข้อมูลส่วนตัว\n'{pre}chatbot settings'".format(pre=clientSettings["prefix"]))
         if cmd == "reboot" and ononlist:
             if clientErrorOrNewPatch == []:
+                originalVersion = requests.get("https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/version.txt").text
+                if clientVersion != originalVersion:
+                    op.message.text = "[updateScript]"
+                    clientSettings["lastOp"] = str(op)
+                    updateScript()
                 return client.sendMessage(to, "ไม่พบข้อผิดพลาดหรือแพทช์ใหม่")
             clientSettings["rebootTime"] = time.time()
             clientSettings["lastOp"] = str(op)
@@ -408,6 +413,9 @@ if clientSettings["lastOp"] is not None:
     if op.type == 25:
         if op.message.text == "{prefix}reboot".format(prefix=clientSettings["prefix"]):
             client.sendMessage(op.message.to, "เริ่มระบบใหม่อีกครั้งเรียบร้อยแล้ว")
+            clientSettings["lastOp"] = None
+        if op.message.text == "[updateScript]".format(prefix=clientSettings["prefix"]):
+            client.sendMessage(op.message.to, "อัพเดทระบบเรียบร้อยแล้ว")
             clientSettings["lastOp"] = None
     else:
         execute(op)
