@@ -380,7 +380,7 @@ def execute(op):
                     statusMessage = profile.statusMessage if profile.statusMessage != "" else " "
                     profileCoverURL = client.getProfileCoverURL()
                     statusMessageContents = {"type": "text","text": statusMessage,"wrap": True,"size": "xs","color": "#000000","weight": "bold","align": "center","flex": 1}
-                    flexContents = {"type": "bubble","hero": {"type": "image","url": profileCoverURL,"size": "full","aspectRatio": "16:9","aspectMode": "cover","action": {"type": "uri","uri": profileCoverURL}},"body": {"type": "box","layout": "vertical","spacing": "md","contents": [{"type": "box","layout": "vertical","spacing": "sm","contents": [{"type": "image","url": profilePicURL,"aspectMode": "cover","size": "xl"},{"type": "text","text": displayName,"wrap": True,"size": "lg","color": "#000000","weight": "bold","align": "center","flex": 0},statusMessageContents]}]}}
+                    flexContents = {"type": "bubble","hero": {"type": "image","url": profileCoverURL,"size": "full","aspectRatio": "16:9","aspectMode": "cover","action": {"type": "uri","uri": profilePicURL}},"body": {"type": "box","layout": "vertical","spacing": "md","contents": [{"type": "box","layout": "vertical","spacing": "sm","contents": [{"type": "image","url": profilePicURL,"aspectMode": "cover","size": "xl"},{"type": "text","text": displayName,"wrap": True,"size": "lg","color": "#000000","weight": "bold","align": "center","flex": 0},statusMessageContents]}]}}
                     data = {"type": "flex", "altText": displayName, "contents":flexContents}
                     sendFlex(to, data)
             return
