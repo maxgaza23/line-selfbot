@@ -31,25 +31,25 @@ clientErrorOrNewPatch = []
 
 helpMessageJSON = {
     'รายละเอียดบัญชี': {
-	    "ชื่อผู้ใช้งาน: {dp}": "",
-	    "เวลาทำงาน: {rt}": "",
-	    "ไอดี: {mid}": "",
-	},
+        "ชื่อผู้ใช้งาน: {dp}": "",
+        "เวลาทำงาน: {rt}": "",
+        "ไอดี: {mid}": "",
+    },
     'คำสั่งทั่วไป': {
         "profile (@)": "โปรไฟล์",
         "contact (@)": "ข้อมูลติดต่อ",
         "mid (@)": "ดู Mid ผู้ใช้",
-	    "optest": "ทดสอบความเร็วในการทำงาน",
-	    "speed": "ทดสอบความเร็วในการรับข้อมูล",
-	    "runtime": "ดูเวลาทำงาน",
-	    "reader":"ดูบัญชีที่อ่านข้อความ",
-	    "tagall":"แท็กสมาชิกทั้งหมด"
+        "optest": "ทดสอบความเร็วในการทำงาน",
+        "speed": "ทดสอบความเร็วในการรับข้อมูล",
+        "runtime": "ดูเวลาทำงาน",
+        "reader":"ดูบัญชีที่อ่านข้อความ",
+        "tagall":"แท็กสมาชิกทั้งหมด"
     },
-	'บัญชี': {
-	    "freboot": "บังคับเริ่มระบบใหม่",
-	    "reboot": "เริ่มระบบใหม่",
-	    "logout": "ออกจากระบบ"
-	}
+    'บัญชี': {
+        "freboot": "บังคับเริ่มระบบใหม่",
+        "reboot": "เริ่มระบบใหม่",
+        "logout": "ออกจากระบบ"
+    }
 }
 
 if "reader" not in clientSettings:
@@ -66,6 +66,7 @@ def helpMessage():
     for x, y in enumerate(helpMessageJSON):
         helpMessageList.append("{l} {title} {l}".format(title=y, l="-"*10))
         for z in helpMessageJSON[y]: helpMessageList.append("- {prefix}{command}".format(prefix=clientSettings["prefix"], command=z))
+        if x+1 != len(helpMessageJSON): helpMessageList.append("")
     return ('\n'.join(helpMessageList))
 
 def getProfile():
@@ -85,7 +86,7 @@ def commandMidContact(to, mid, cmd):
         if cmd == "contact":
             return client.sendContact(to, mid)
     return
-	
+    
 def commandAddOrDel(to, mid, cmd):
     global clientSettings
     if cmd in ["on","off"]:
@@ -121,7 +122,7 @@ def oneOnList(text):
 def settingsCommand(text):
     setTo = None if len(text.split(" ")) != 2 else 'on' if text.split(" ")[1] == 'on' else 'off' if text.split(" ")[1] == 'off' else None
     return setTo
-	
+    
 def settingsCommand2(text):
     setTo = text.split(":")
     if len(setTo) == 1: return None
@@ -131,7 +132,7 @@ def settingsCommand2(text):
     elif setTo == "del":
         return "off"
     return None
-	
+    
 def saveSettings():
     global clientSettings
     try:
@@ -139,13 +140,13 @@ def saveSettings():
         json.dump(clientSettings, f, sort_keys=True, indent=4, ensure_ascii=False)
     except Exception as e:
         log(str(e))
-	
+    
 def sendFlex(to, data):
     view = client.issueLiffView(LiffViewRequest("1616062718-gRzkqKmm",LiffContext(chat=LiffChatContext(chatMid=to))))
     headers = {'content-type': 'application/json', "Authorization": "Bearer %s" % view.accessToken, "X-Requested-With": "jp.naver.line.android", "Connection": "keep-alive"}
     data = {"messages": [data]}
     post = requests.post("https://api.line.me/message/v3/share", headers=headers,data=json.dumps(data))
-	
+    
 def mentionMembers(to, mids=[], result=''):
     parsed_len = len(mids)//20+1
     mention = '@freeclient\n'
@@ -162,7 +163,7 @@ def mentionMembers(to, mids=[], result=''):
             if result.endswith('\n'): result = result[:-1]
             client.sendMessage(to, result, {'MENTION': json.dumps({'MENTIONEES': mentionees})}, 0)
         result = ''
-	
+    
 def getRuntime():
     totalTime = time.time() - clientStartTime
     mins, secs = divmod(totalTime, 60)
@@ -177,10 +178,10 @@ def getRuntime():
         resTime += "%2d นาที " % (mins)
     resTime += "%2d วินาที" % (secs)
     return resTime
-	
+    
 OPTEST = {}
 MimicTEMP = []
-	
+    
 def execute(op):
     global clientSettings
     global OPTEST
@@ -371,12 +372,12 @@ def execute(op):
         if op.param2 not in clientSettings["reader"]["readRom"][op.param1]:
             clientSettings["reader"]["readRom"][op.param1][op.param2] = True
     clientSettings["lastOp"] = None
-		
+        
 if client.authToken != clientSettings["authToken"]:
     clientSettings["authToken"] = client.authToken
     log("Save new auth token")
     saveSettings()
-		
+        
 if "lastOp" not in clientSettings:
     clientSettings["lastOp"] = None
 if clientSettings["lastOp"] is not None:
@@ -387,7 +388,7 @@ if clientSettings["lastOp"] is not None:
             clientSettings["lastOp"] = None
     else:
         execute(op)
-		
+        
 while True:
     ops = clientPoll.singleTrace(count=100)
     if ops != None:
