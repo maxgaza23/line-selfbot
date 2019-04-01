@@ -331,7 +331,7 @@ def execute(op):
                 return client.sendMessage(to, "ไม่มีข้อผิดพลาดหรือไม่พบข้อผิดพลาดที่ถูกบันทึก")
             for e in clientErrorOrNewPatch:
                 text+="\n- {}".format(e)
-            text+="\n\nรายงานข้อผิดพลาดได้ที่:\nline://ti/p/~{spcontact}"
+            text+="\n\nรายงานข้อผิดพลาดได้ที่:\nline://ti/p/~{spcontact}".format(spcontact="pasunx.tk")
             client.sendMessage(to, text)
         if cmd == "chatbot":
             return client.sendMessage(to, "กรุณาตั้งค่าข้อมูลส่วนตัว\n'{pre}chatbot settings'".format(pre=clientSettings["prefix"]))
