@@ -438,6 +438,7 @@ if clientSettings["lastOp"] is not None:
         if op.message.text == "[updateScript]".format(prefix=clientSettings["prefix"]):
             client.sendMessage(op.message.to, "อัพเดทระบบเรียบร้อยแล้ว")
             clientSettings["lastOp"] = None
+        saveSettings()
     else:
         execute(op)
         
