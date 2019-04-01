@@ -24,8 +24,8 @@ def updateScript():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-if clientVersion != originalVersion:
-    updateScript()
+#if clientVersion != originalVersion:
+#    updateScript()
 
 from linepy import LINE as CLIENT
 from linepy import OEPoll
@@ -68,6 +68,9 @@ helpMessageJSON = {
         "reader":"ดูบัญชีที่อ่านข้อความ",
         "tagall":"แท็กสมาชิกทั้งหมด"
     },
+	'คำสั่งพิเศษ': {
+        "shorturl": "ย่อ URL"
+	},
     'บัญชี': {
         "freboot": "บังคับเริ่มระบบใหม่",
         "reboot": "เริ่มระบบใหม่",
@@ -88,7 +91,7 @@ def helpMessage():
     helpMessageList = []
     for x, y in enumerate(helpMessageJSON):
         helpMessageList.append("{l} {title} {l}".format(title=y, l="-"*10))
-        for z in helpMessageJSON[y]: helpMessageList.append("- {prefix}{command}".format(prefix=clientSettings["prefix"], command=z))
+        for z in helpMessageJSON[y]: helpMessageList.append("- {prefix}{command} {des}".format(prefix=clientSettings["prefix"], command=z, des=helpMessageJSON[y][z]))
         if x+1 != len(helpMessageJSON): helpMessageList.append("")
     return ('\n'.join(helpMessageList))
 
@@ -317,6 +320,18 @@ def execute(op):
                 if membersMidsList == []:
                     return client.sendMessage(to, "ไม่มีสมาชิกในกลุ่มหรือห้องแชท")
                 return mentionMembers(to, membersMidsList)
+        if cmd == "shorturl":
+            urlsList = msg.text.split(" ")
+            urlsList.remove(fullCmd)
+            result = "URLs:"
+            if urlsList != []:
+                for url in urlsList:
+                    r = requests.get("https://pasunx.tk/api/urlshorten.php?url={url}".format(url=url))
+                    res = json.loads(r.text)['text']
+                    if res == "VALID URL! URL must be startwith http or https":
+                        res = "URL ไม่ถูกต้อง"
+                    result+="\n\n{}\n- {}".format(url, res)
+                client.sendMessage(to, result)
         if cmd == "profile" and ononlist:
             profileList = []
             if len(msg.text.split(" ")) == 1:
