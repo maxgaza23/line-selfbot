@@ -1,13 +1,36 @@
+# -*- coding: utf-8 -*-
+import requests, json, codecs, time, sys, os
+clientVersion = open('version.txt','r').readlines()[0]
+originalVersion = requests.get("https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/version.txt").text
+
+def updateScript():
+    clientFilePath = "https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/client.py"
+    clientFileSource = requests.get(clientFilePath)
+    clientFileName = clientFilePath[::-1].split(".")[1][::-1].split("/")[::-1][0] + "." + clientFilePath[::-1].split(".")[0][::-1]
+    if os.path.isfile(clientFileName+".old"):
+        os.remove(clientFileName+".old")
+    if os.path.isfile(clientFileName+".new"):
+        os.remove(clientFileName+".new")
+    if os.path.isfile("version.txt"):
+        os.remove("version.txt")
+    with open("version.txt", 'a+', encoding='utf-8') as v:
+        v.write(originalVersion)
+    with open(clientFileName+".new", 'a+', encoding='utf-8') as new:
+        for line in clientFileSource.text.split("\n"):
+            new.write(line)
+    os.rename(clientFileName, clientFileName+'.old')
+    os.rename(clientFileName+'.new', clientFileName)
+    time.sleep(1)
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
+if clientVersion != originalVersion:
+    updateScript()
+
 from linepy import LINE as CLIENT
 from linepy import OEPoll
 from datetime import datetime
 from akad.ttypes import LiffViewRequest, LiffContext, LiffChatContext, Operation, Message
-import json
-import codecs
-import time
-import sys
-import os
-import requests
 
 clientFileLocation = 'settings.json'
 clientSettingsLoad = codecs.open(clientFileLocation, 'r', 'utf-8')
