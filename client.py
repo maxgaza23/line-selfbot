@@ -29,41 +29,28 @@ clientMid = client.profile.mid
 clientPoll = OEPoll(client)
 clientErrorOrNewPatch = []
 
-listHelpMessage = {
-    "รายละเอียดบัญชี": "ftitle",
-	"ชื่อผู้ใช้งาน: {dp}": "dtail",
-	"เวลาทำงาน: {rt}": "dtail",
-	"ไอดี: {mid}": "dtail",
-    "คำสั่งทั่วไป": "title",
-    "โปรไฟล์": "profile (@)",
-    "ข้อมูลติดต่อ": "contact (@)",
-    "ดู Mid ผู้ใช้": "mid (@)",
-	"ทดสอบความเร็วในการทำงาน": "optest",
-	"ทดสอบความเร็วในการรับข้อมูล": "speed",
-	"ดูเวลาทำงาน": "runtime",
-	"ดูบัญชีที่อ่านข้อความ":"reader",
-	"แท็กสมาชิกทั้งหมด":"tagall",
-	"คำสั่งพิเศษ": "title",
-	"แชทบอท": "chatbot",
-	"บัญชี": "title",
-	"บังคับเริ่มระบบใหม่": "freboot",
-	"เริ่มระบบใหม่": "reboot",
-	"ออกจากระบบ": "logout"
+helpMessageJSON = {
+    'รายละเอียดบัญชี': {
+	    "ชื่อผู้ใช้งาน: {dp}": "",
+	    "เวลาทำงาน: {rt}": "",
+	    "ไอดี: {mid}": "",
+	},
+    'คำสั่งทั่วไป': {
+        "profile (@)": "โปรไฟล์",
+        "contact (@)": "ข้อมูลติดต่อ",
+        "mid (@)": "ดู Mid ผู้ใช้",
+	    "optest": "ทดสอบความเร็วในการทำงาน",
+	    "speed": "ทดสอบความเร็วในการรับข้อมูล",
+	    "runtime": "ดูเวลาทำงาน",
+	    "reader":"ดูบัญชีที่อ่านข้อความ",
+	    "tagall":"แท็กสมาชิกทั้งหมด"
+    },
+	'บัญชี': {
+	    "freboot": "บังคับเริ่มระบบใหม่",
+	    "reboot": "เริ่มระบบใหม่",
+	    "logout": "ออกจากระบบ"
+	}
 }
-helpMessageLine = "-"*10
-# THIS IS ERROR #helpMessage = ["\n- {}{} {}".format(clientSettings["prefix"], cmd, listHelpMessage[cmd]) if cmd not in ["fTitle","title"] else "{l} {c} {l}".format(c=listHelpMessage[cmd], l=helpMessageLine) if cmd == "fTitle" else "\n\n{l} {c} {l}".format(c=listHelpMessage[cmd], l=helpMessageLine) for cmd in listHelpMessage]
-helpMessage = []
-for x in listHelpMessage:
-    if listHelpMessage[x] not in ["ftitle","title","dtail"]:
-        helpMessage.append("\n- {pre}{cmd} {des}".format(pre=clientSettings['prefix'], des=x, cmd=listHelpMessage[x]))
-    elif listHelpMessage[x] not in ["dtail"]:
-        lines = "\n\n{l} {title} {l}"
-        if listHelpMessage[x] == "ftitle":
-            lines = "{l} {title} {l}"
-        helpMessage.append(lines.format(l=helpMessageLine, title=x))
-    else:
-        helpMessage.append("\n{cmd}".format(cmd=x))
-clientHelpMessage = "".join(helpMessage)
 
 if "reader" not in clientSettings:
     clientSettings["reader"] = {}
@@ -72,6 +59,14 @@ if "reader" not in clientSettings:
 def log(text):
     global client
     print("[%s] [%s] : %s" % (str(datetime.now()), client.profile.displayName, text))
+
+def helpMessage():
+    global clientSettings
+    helpMessageList = []
+    for x, y in enumerate(helpMessageJSON):
+        helpMessageList.append("{l} {title} {l}".format(title=y, l="-"*7))
+        for z in helpMessageJSON[y]: helpMessageList.append("- {prefix}{command}".format(prefix=clientSettings["prefix"], command=z))
+    return ('\n'.join(helpMessageList))
 
 def getProfile():
     global client
@@ -223,7 +218,7 @@ def execute(op):
             return
         fullCmd = (clientSettings["prefix"]+cmd)
         if cmd == "help" and ononlist:
-            return client.sendMessage(to, clientHelpMessage.format(dp=client.profile.displayName,mid=client.profile.mid[:len(client.profile.mid)-20]+"*"*7, rt=getRuntime()))
+            return client.sendMessage(to, helpMessage().format(dp=client.profile.displayName,mid=client.profile.mid[:len(client.profile.mid)-20]+"*"*7, rt=getRuntime()))
         if cmd == "optest" and ononlist:
             for x in range(5):
                 OPTEST[client.sendMessage(to, ".").id] = time.time()
@@ -387,13 +382,8 @@ if "lastOp" not in clientSettings:
 if clientSettings["lastOp"] is not None:
     op = eval(clientSettings["lastOp"])
     if op.type == 25:
-        if op.message.text == "{}reboot".format(clientSettings["prefix"]):
-            rebootMSG = ""
-            if "rebootTime" in clientSettings:
-                totalTime = str(time.time()-clientSettings["rebootTime"]).split(".")
-                totalTime = totalTime[0] + "." + totalTime[1][:2]
-                rebootMSG = " - {} วินาที".format(totalTime)
-            client.sendMessage(op.message.to, "เริ่มระบบใหม่อีกครั้งเรียบร้อยแล้ว{}".format(rebootMSG))
+        if op.message.text == "{prefix}reboot".format(prefix=clientSettings["prefix"]):
+            client.sendMessage(op.message.to, "เริ่มระบบใหม่อีกครั้งเรียบร้อยแล้ว")
             clientSettings["lastOp"] = None
     else:
         execute(op)
@@ -407,6 +397,6 @@ while True:
                 execute(op)
             except Exception as e:
                 clientErrorOrNewPatch.append(e)
-                client.sendMessage(eval(clientSettings["lastOp"]).message.to, "พบข้อผิดพลาดพิมพ์ '{x}error' เพื่อดูข้อผิดพลาด\nหรือพิมพ์ '{x}reboot' เพื่อเริ่มระบบใหม่อีกครั้ง".format(x=clientSettings["prefix"]))
+                client.sendMessage(eval(clientSettings["lastOp"]).message.to, "พบข้อผิดพลาดพิมพ์ '{prefix}error' เพื่อดูข้อผิดพลาด\nหรือพิมพ์ '{prefix}reboot' เพื่อเริ่มระบบใหม่อีกครั้ง".format(prefix=clientSettings["prefix"]))
                 log(str(e))
             clientPoll.setRevision(op.revision)
