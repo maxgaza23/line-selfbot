@@ -91,7 +91,9 @@ def helpMessage():
     helpMessageList = []
     for x, y in enumerate(helpMessageJSON):
         helpMessageList.append("{l} {title} {l}".format(title=y, l="-"*10))
-        for z in helpMessageJSON[y]: helpMessageList.append("- {prefix}{command} {des}".format(prefix=clientSettings["prefix"], command=z, des=helpMessageJSON[y][z]))
+        for z in helpMessageJSON[y]:
+            if helpMessageJSON[y][z] == "": helpMessageList.append(z)
+            else: helpMessageList.append("- {prefix}{command} {des}".format(prefix=clientSettings["prefix"], command=z, des=helpMessageJSON[y][z]))
         if x+1 != len(helpMessageJSON): helpMessageList.append("")
     return ('\n'.join(helpMessageList))
 
