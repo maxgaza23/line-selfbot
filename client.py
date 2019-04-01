@@ -3,16 +3,22 @@ import requests, json, codecs, time, sys, os
 clientVersion = open('version.txt','r').readlines()[0]
 originalVersion = requests.get("https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/version.txt").text
 
+def removeIfIsFile(fileName):
+    if os.path.isfile(fileName):
+        os.remove(fileName)
+
+def restartScript():
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
 def updateScript():
     clientFilePath = "https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/client.py"
     clientFileSource = requests.get(clientFilePath)
     clientFileName = clientFilePath[::-1].split(".")[1][::-1].split("/")[::-1][0] + "." + clientFilePath[::-1].split(".")[0][::-1]
-    if os.path.isfile(clientFileName+".old"):
-        os.remove(clientFileName+".old")
-    if os.path.isfile(clientFileName+".new"):
-        os.remove(clientFileName+".new")
-    if os.path.isfile("version.txt"):
-        os.remove("version.txt")
+    removeIfIsFile(clientFileName+".old")
+    removeIfIsFile(clientFileName+".new")
+    removeIfIsFile("version.txt")
+
     with open("version.txt", 'a+', encoding='utf-8') as v:
         v.write(originalVersion)
     with open(clientFileName+".new", 'a+', encoding='utf-8') as new:
@@ -21,8 +27,7 @@ def updateScript():
     os.rename(clientFileName, clientFileName+'.old')
     os.rename(clientFileName+'.new', clientFileName)
     time.sleep(1)
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
+    restartScript()
 
 if clientVersion != originalVersion:
     updateScript()
@@ -232,6 +237,7 @@ def execute(op):
         msg = op.message
         text = msg.text
         to = msg.to
+		
         if text is None:
             return
         if msg.id in MimicTEMP:
@@ -241,17 +247,21 @@ def execute(op):
             totalTime = time.time() - OPTEST[msg.id]
             del OPTEST[msg.id]
             client.sendMessage(to, "Pong! ({} ms)\n{} วินาที".format(str(totalTime*1000).split(".")[0], totalTime))
+			
         cmd = getCommand(text)
-        ononlist = oneOnList(text)
+        oneonlist = oneOnList(text)
         if cmd == "False":
             clientSettings["reader"]["readRom"][to] = {}
             return
         fullCmd = (clientSettings["prefix"]+cmd)
-        if cmd == "help" and ononlist:
+		
+        if cmd == "help" and oneonlist:
             return client.sendMessage(to, helpMessage().format(dp=client.profile.displayName,mid=client.profile.mid[:len(client.profile.mid)-20]+"*"*7, rt=getRuntime()))
-        if cmd == "optest" and ononlist:
+			
+        if cmd == "optest" and oneonlist:
             for x in range(5):
                 OPTEST[client.sendMessage(to, ".").id] = time.time()
+				
         if cmd in ["mimic:add","mimic:del","mimic"]:
             if to not in clientSettings['mimic']:
                 clientSettings['mimic'][to] = {}
@@ -273,13 +283,16 @@ def execute(op):
                     if len(mid) == len(clientMid):
                         commandAddOrDel(to, mid, cmd)
                 return
-        if cmd == "runtime" and ononlist:
+				
+        if cmd == "runtime" and oneonlist:
             client.sendMessage(to, getRuntime())
-        if cmd == "speed" and ononlist:
+			
+        if cmd == "speed" and oneonlist:
             startTime = time.time()
             pingMessage = getProfile()
             totalTime = time.time() - startTime
             client.sendMessage(to, "Pong! ({} ms)\n{} วินาที".format(str(totalTime*1000).split(".")[0], totalTime))
+			
         if cmd in ["contact","mid"]:
             if len(msg.text.split(" ")) == 1:
                 return commandMidContact(to, clientMid, cmd)
@@ -301,14 +314,16 @@ def execute(op):
                 if len(mid) == len(clientMid):
                     commandMidContact(to, mid, cmd)
             return
-        if cmd == "reader" and ononlist:
+			
+        if cmd == "reader" and oneonlist:
             if to not in clientSettings["reader"]["readRom"]:
                 clientSettings["reader"]["readRom"][to] = {}
             readerMids = [i for i in clientSettings["reader"]["readRom"][to]]
             if readerMids == []:
                 return client.sendMessage(to, 'ไม่มีบัญชีที่อ่านข้อความ')
             return mentionMembers(to, readerMids, 'บัญชีที่อ่านข้อความ:\n')
-        if cmd == 'tagall' and ononlist:
+			
+        if cmd == 'tagall' and oneonlist:
             membersMidsList = []
             if msg.toType == 1:
                 room = client.getCompactRoom(to)
@@ -323,6 +338,7 @@ def execute(op):
                 if membersMidsList == []:
                     return client.sendMessage(to, "ไม่มีสมาชิกในกลุ่มหรือห้องแชท")
                 return mentionMembers(to, membersMidsList)
+				
         if cmd == "shorturl":
             urlsList = msg.text.split(" ")
             urlsList.remove(fullCmd)
@@ -336,7 +352,8 @@ def execute(op):
                             res = "URL ไม่ถูกต้อง"
                         result+="\n[{}.] {}\n- {}".format(num+1, url, res)
                 client.sendMessage(to, result)
-        if cmd == "profile" and ononlist:
+				
+        if cmd == "profile" and oneonlist:
             profileList = []
             if len(msg.text.split(" ")) == 1:
                 profile = getProfile()
@@ -367,7 +384,8 @@ def execute(op):
                     data = {"type": "flex", "altText": displayName, "contents":flexContents}
                     sendFlex(to, data)
             return
-        if cmd == "error" and ononlist:
+			
+        if cmd == "error" and oneonlist:
             text = "ข้อผิดพลาดที่บันทึก:"
             if clientErrorOrNewPatch == []:
                 return client.sendMessage(to, "ไม่มีข้อผิดพลาดหรือไม่พบข้อผิดพลาดที่ถูกบันทึก")
@@ -375,9 +393,11 @@ def execute(op):
                 text+="\n- {}".format(e)
             text+="\n\nรายงานข้อผิดพลาดได้ที่:\nline://ti/p/~{spcontact}".format(spcontact="pasunx.tk")
             client.sendMessage(to, text)
+			
         if cmd == "chatbot":
-            return client.sendMessage(to, "กรุณาตั้งค่าข้อมูลส่วนตัว\n'{pre}chatbot settings'".format(pre=clientSettings["prefix"]))
-        if cmd == "reboot" and ononlist:
+            return client.sendMessage(to, "กรุณาตั้งค่าข้อมูลส่วนตัว\n'{prefix}chatbot settings'".format(prefix=clientSettings["prefix"]))
+			
+        if cmd == "reboot" and oneonlist:
             if clientErrorOrNewPatch == []:
                 originalVersion = requests.get("https://raw.githubusercontent.com/PASUNX/LINESELFBOT/master/version.txt").text
                 if clientVersion != originalVersion:
@@ -391,23 +411,23 @@ def execute(op):
             clientSettings["rebootTime"] = time.time()
             clientSettings["lastOp"] = str(op)
             saveSettings()
-            time.sleep(0.5)
             client.sendMessage(to, "กำลังเริ่มระบบใหม่อีกครั้ง")
             time.sleep(1)
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
-        if cmd == "freboot" and ononlist:
+            restartScript()
+			
+        if cmd == "freboot" and oneonlist:
             op.message.text = "{}reboot".format(clientSettings["prefix"])
             clientErrorOrNewPatch.append("Force Reboot")
             client.sendMessage(to, "กรุณารอสักครู่")
-            time.sleep(0.5)
             execute(op)
-        if cmd == "logout" and ononlist:
+			
+        if cmd == "logout" and oneonlist:
             del clientSettings["startTime"]
             clientSettings["lastOp"] = None
             saveSettings()
             time.sleep(1)
             sys.exit()
+			
     if op.type == 26:
         msg = op.message
         to = msg._from if msg.toType == 0 else msg.to
@@ -416,11 +436,13 @@ def execute(op):
                 if msg.contentType == 0:
                     if msg.text is not None:
                         MimicTEMP.append(client.sendMessage(to, msg.text).id)
+
     if op.type == 55:
         if op.param1 not in clientSettings["reader"]["readRom"]:
             clientSettings["reader"]["readRom"][op.param1] = {}
         if op.param2 not in clientSettings["reader"]["readRom"][op.param1]:
             clientSettings["reader"]["readRom"][op.param1][op.param2] = True
+			
     clientSettings["lastOp"] = None
         
 if client.authToken != clientSettings["authToken"]:
