@@ -1,4 +1,4 @@
-# LINE Unofficial Bot
+# LINE UNOFFICIAL BOT
 ### Installation
 ```sh
 $ python -m pip install -r requirement.txt
