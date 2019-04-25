@@ -1,11 +1,10 @@
-# FREE SELF BOT - 01
-LINE APPLICATION UNOFFICIAL BOT
-### INSTALLATION
+# LINE Unofficial Bot
+### Installation
 ```sh
 $ python -m pip install -r requirement.txt
 $ python client.py
 ```
 
-### CREDIT BY @PASUNX
+### Contact @pasunx
 - `LINE ID: pasunx.tk`
 
